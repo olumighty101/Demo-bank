@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>Premium Banking Demo</title>
+  <style>
+    :root {
+      --bg: #0b1020; --panel: #111a2d; --panel2: #172238;
+      --line: #2a3850; --text: #f8fafc; --muted: #9aa9bf;
+      --gold: #f4c76b; --green: #4ade80; --red: #fb7185; --amber: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(ellipse at top, #1a2944 0%, var(--bg) 55%);
+      color: var(--text); min-height: 100vh;
+    }
+    .demo-strip {
+      text-align: center; padding: 10px 14px; background: #4b3510; color: #ffe3a1;
+      font-size: 12px; font-weight: 800; letter-spacing: .12em;
+      border-bottom: 1px solid #88662c;
+    }
+    .wrap { width: min(1100px, 100% - 32px); margin: 28px auto 48px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:24px; }
+    .brand { display:flex; align-items:center; gap:13px; }
+    .logo {
+      width:48px; height:48px; border-radius:14px; display:grid; place-items:center;
+      background: linear-gradient(135deg, #e7bd60, #a66e1f); color:#101827; font-size:24px; font-weight:900;
+      box-shadow: 0 8px 25px #0004;
+    }
+    h1 { margin:0; font-size: clamp(19px, 3vw, 26px); letter-spacing:-.03em; }
+    .subtitle { color:var(--muted); font-size:13px; margin-top:4px; }
+    .demo-pill { border:1px solid #8d6d2c; color:#ffe3a1; background:#302711; padding:8px 11px; border-radius:999px; font-size:11px; font-weight:800; white-space:nowrap; }
+    .notice { border:1px solid #715a2d; background:#241f15; color:#f6dca0; padding:13px 15px; border-radius:13px; line-height:1.5; font-size:13px; margin-bottom:20px; }
+    .balance-card {
+      background: linear-gradient(120deg, #18243a, #111a2d 70%); border:1px solid #34445e; border-radius:22px;
+      padding: clamp(20px, 4vw, 34px); box-shadow:0 18px 50px #0003; position:relative; overflow:hidden;
+    }
+    .balance-card:after { content:"DEMO"; position:absolute; right:-7px; bottom:-28px; font-size:clamp(72px, 15vw, 150px); font-weight:900; color:#ffffff08; letter-spacing:.1em; pointer-events:none; }
+    .eyebrow { color:var(--muted); text-transform:uppercase; font-size:12px; letter-spacing:.13em; font-weight:700; }
+    .balance { font-size:clamp(34px, 7vw, 56px); font-weight:800; letter-spacing:-.05em; margin:10px 0 8px; }
+    .balance-foot { color:var(--muted); font-size:13px; }
+    .actions { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; margin:16px 0 26px; }
+    .action {
+      border:1px solid var(--line); background:#111827; color:#77869c; padding:15px; border-radius:14px;
+      display:flex; align-items:center; justify-content:center; gap:9px; font-weight:750; cursor:not-allowed;
+    }
+    .action span { color:var(--red); font-size:11px; font-weight:800; text-transform:uppercase; }
+    .section-head { display:flex; justify-content:space-between; align-items:end; gap:12px; margin:26px 0 14px; }
+    h2 { font-size:20px; margin:0; letter-spacing:-.025em; }
+    .section-note { color:var(--muted); font-size:12px; margin-top:5px; }
+    .filters { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+    .filters button {
+      background:#111a2d; color:#c6d0df; border:1px solid var(--line); padding:9px 12px; border-radius:999px;
+      font-size:12px; cursor:pointer;
+    }
+    .filters button.active { color:#111827; background:var(--gold); border-color:var(--gold); font-weight:800; }
+    .day-group { margin:16px 0; border:1px solid var(--line); border-radius:16px; overflow:hidden; background:#10182a; }
+    .day-title { background:#172238; padding:12px 16px; font-size:13px; font-weight:800; color:#d8e0ec; border-bottom:1px solid var(--line); }
+    .transaction { display:grid; grid-template-columns:42px minmax(0,1fr) auto; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid #253149; }
+    .transaction:last-child { border-bottom:0; }
+    .status-icon { width:40px; height:40px; border-radius:50%; display:grid; place-items:center; font-size:19px; font-weight:900; }
+    .status-icon.success { background:#123b2d; color:var(--green); }
+    .status-icon.declined { background:#431e2a; color:var(--red); }
+    .status-icon.pending { background:#453719; color:var(--amber); }
+    .person { font-size:14px; font-weight:750; overflow-wrap:anywhere; }
+    .meta { color:var(--muted); font-size:11px; margin-top:5px; }
+    .amount { text-align:right; font-size:14px; font-weight:800; white-space:nowrap; }
+    .status { font-size:11px; margin-top:5px; text-align:right; font-weight:800; }
+    .status.success { color:var(--green); } .status.declined { color:var(--red); } .status.pending { color:var(--amber); }
+    .empty { display:none; padding:24px; color:var(--muted); text-align:center; }
+    footer { margin-top:24px; text-align:center; color:#8593a8; font-size:11px; line-height:1.7; }
+    @media (max-width:560px) {
+      .wrap { width:calc(100% - 22px); margin-top:18px; }
+      header { align-items:flex-start; }
+      .demo-pill { margin-top:4px; }
+      .transaction { grid-template-columns:36px minmax(0,1fr) auto; gap:9px; padding:12px 10px; }
+      .status-icon { width:34px; height:34px; }
+      .person { font-size:13px; }
+      .amount { font-size:12px; }
+      .status { font-size:10px; }
+      .meta { font-size:10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-strip">SIMULATION ONLY · NOT A REAL BANK OR BANK STATEMENT</div>
+  <main class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">P</div>
+        <div>
+          <h1>Premium Banking Demo</h1>
+          <div class="subtitle">Illustrative account dashboard</div>
+        </div>
+      </div>
+      <div class="demo-pill">DEMO ACCOUNT</div>
+    </header>
+
+    <div class="notice">
+      <strong>Fictional demonstration:</strong> This page displays sample data only. It is not connected to a bank,
+      the balance is not real money, and the transaction records below are invented examples.
+    </div>
+
+    <section class="balance-card" aria-label="Demo balance">
+      <div class="eyebrow">Displayed demo balance</div>
+      <div class="balance">$6,400,000.00</div>
+      <div class="balance-foot">Illustrative USD balance · No funds are held or available</div>
+    </section>
+
+    <section class="actions" aria-label="Unavailable demo actions">
+      <button class="action" type="button" disabled>↗ Send money <span>Disabled</span></button>
+      <button class="action" type="button" disabled>▣ Withdraw <span>Disabled</span></button>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Transaction history</h2>
+          <div class="section-note">Sample records · Dates shown for demonstration</div>
+        </div>
+      </div>
+      <div class="filters" aria-label="Filter demo transactions">
+        <button class="active" data-filter="all" type="button">All transactions</button>
+        <button data-filter="success" type="button">Successful</button>
+        <button data-filter="declined" type="button">Declined</button>
+        <button data-filter="pending" type="button">Pending</button>
+      </div>
+      <div id="history"></div>
+      <div id="empty" class="empty">No demo transactions match this filter.</div>
+    </section>
+
+    <footer>
+      PREMIUM BANKING DEMO · FICTIONAL DATA ONLY<br>
+      This is a visual prototype, not a financial service, proof of funds, or evidence of actual transactions.
+    </footer>
+  </main>
+
+  <script>
+    const transactions = [
+      { date: "2026-10-13", name: "Michael Johnson", amount: 102000, status: "success", id: "DEMO-007" },
+      { date: "2026-10-13", name: "Brian Major", amount: 54000, status: "declined", id: "DEMO-001" },
+
+      { date: "2026-10-14", name: "Brian Major", amount: 54000, status: "declined", id: "DEMO-002" },
+
+      { date: "2026-10-15", name: "Sarah Thompson", amount: 89000, status: "success", id: "DEMO-008" },
+      { date: "2026-10-15", name: "Brian Major", amount: 15000, status: "declined", id: "DEMO-003" },
+      { date: "2026-10-15", name: "Daniel Wilson", amount: 5000, status: "success", id: "DEMO-012" },
+
+      { date: "2026-10-16", name: "James Anderson", amount: 20000, status: "success", id: "DEMO-009" },
+      { date: "2026-10-16", name: "Brian Major", amount: 38000, status: "declined", id: "DEMO-004" },
+      { date: "2026-10-16", name: "Olivia Martin", amount: 13000, status: "success", id: "DEMO-010" },
+      { date: "2026-10-16", name: "Robert Davis", amount: 259000, status: "success", id: "DEMO-013" },
+      { date: "2026-10-16", name: "Brian Major", amount: 18000, status: "declined", id: "DEMO-005" },
+      { date: "2026-10-16", name: "David Williams", amount: 54000, status: "success", id: "DEMO-011" },
+
+      { date: "2026-10-20", name: "Brian Major", amount: 43500, status: "pending", id: "DEMO-005A" },
+      { date: "2026-10-20", name: "Brian Major", amount: 29700, status: "pending", id: "DEMO-006" }
+    ];
+
+    const money = value => new Intl.NumberFormat("en-US", {
+      style: "currency", currency: "USD", maximumFractionDigits: 2
+    }).format(value);
+
+    const dateLabel = date => new Date(date + "T12:00:00").toLocaleDateString("en-US", {
+      weekday: "long", month: "long", day: "numeric", year: "numeric"
+    });
+
+    const statusLabel = status => ({
+      success: "Successful · Demo",
+      declined: "Declined · Demo",
+      pending: "Pending · Demo"
+    }[status]);
+
+    const iconLabel = status => ({ success: "✓", declined: "×", pending: "…" }[status]);
+
+    function render(filter = "all") {
+      const list = transactions
+        .filter(tx => filter === "all" || tx.status === filter)
+        .slice()
+        .sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+
+      const grouped = {};
+      list.forEach(tx => (grouped[tx.date] ||= []).push(tx));
+
+      const history = document.getElementById("history");
+      history.replaceChildren();
+
+      Object.entries(grouped).forEach(([date, entries]) => {
+        const group = document.createElement("section");
+        group.className = "day-group";
+
+        const heading = document.createElement("div");
+        heading.className = "day-title";
+        heading.textContent = dateLabel(date);
+        group.appendChild(heading);
+
+        entries.forEach(tx => {
+          const row = document.createElement("div");
+          row.className = "transaction";
+
+          const icon = document.createElement("div");
+          icon.className = "status-icon " + tx.status;
+          icon.textContent = iconLabel(tx.status);
+          icon.setAttribute("aria-hidden", "true");
+
+          const details = document.createElement("div");
+          const person = document.createElement("div");
+          person.className = "person";
+          person.textContent = tx.name;
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.textContent = tx.id + " · Simulated record";
+          details.append(person, meta);
+
+          const right = document.createElement("div");
+          const amount = document.createElement("div");
+          amount.className = "amount";
+          amount.textContent = money(tx.amount);
+          const status = document.createElement("div");
+          status.className = "status " + tx.status;
+          status.textContent = statusLabel(tx.status);
+          right.append(amount, status);
+
+          row.append(icon, details, right);
+          group.appendChild(row);
+        });
+        history.appendChild(group);
+      });
+
+      document.getElementById("empty").style.display = list.length ? "none" : "block";
+    }
+
+    document.querySelectorAll(".filters button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".filters button").forEach(item => item.classList.remove("active"));
+        button.classList.add("active");
+        render(button.dataset.filter);
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>
